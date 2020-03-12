@@ -1,5 +1,7 @@
 from os.path import dirname, exists, join
 
+import mmdet
+
 
 def _get_config_directory():
     """ Find the predefined detector config directory """
@@ -31,21 +33,9 @@ def test_config_build_detector():
     # config_names = [relpath(p, config_dpath) for p in config_fpaths]
 
     # Only tests a representative subset of configurations
-
     config_names = [
-        # 'dcn/faster_rcnn_dconv_c3-c5_r50_fpn_1x.py',
-        # 'dcn/cascade_mask_rcnn_dconv_c3-c5_r50_fpn_1x.py',
-        # 'dcn/faster_rcnn_dpool_r50_fpn_1x.py',
-        'dcn/mask_rcnn_dconv_c3-c5_r50_fpn_1x.py',
-        # 'dcn/faster_rcnn_dconv_c3-c5_x101_32x4d_fpn_1x.py',
-        # 'dcn/cascade_rcnn_dconv_c3-c5_r50_fpn_1x.py',
-        # 'dcn/faster_rcnn_mdpool_r50_fpn_1x.py',
-        # 'dcn/faster_rcnn_mdconv_c3-c5_group4_r50_fpn_1x.py',
-        # 'dcn/faster_rcnn_mdconv_c3-c5_r50_fpn_1x.py',
-        # ---
         # 'htc/htc_x101_32x4d_fpn_20e_16gpu.py',
         'htc/htc_without_semantic_r50_fpn_1x.py',
-        # 'htc/htc_dconv_c3-c5_mstrain_400_1400_x101_64x4d_fpn_20e.py',
         # 'htc/htc_x101_64x4d_fpn_20e_16gpu.py',
         # 'htc/htc_r50_fpn_1x.py',
         # 'htc/htc_r101_fpn_20e.py',
@@ -62,29 +52,14 @@ def test_config_build_detector():
         # ---
         'double_heads/dh_faster_rcnn_r50_fpn_1x.py',
         # ---
-        'empirical_attention/faster_rcnn_r50_fpn_attention_0010_dcn_1x.py',
         # 'empirical_attention/faster_rcnn_r50_fpn_attention_1111_1x.py',
         # 'empirical_attention/faster_rcnn_r50_fpn_attention_0010_1x.py',
-        # 'empirical_attention/faster_rcnn_r50_fpn_attention_1111_dcn_1x.py',
         # ---
         # 'ms_rcnn/ms_rcnn_r101_caffe_fpn_1x.py',
         # 'ms_rcnn/ms_rcnn_x101_64x4d_fpn_1x.py',
         # 'ms_rcnn/ms_rcnn_r50_caffe_fpn_1x.py',
         # ---
-        # 'guided_anchoring/ga_faster_x101_32x4d_fpn_1x.py',
-        # 'guided_anchoring/ga_rpn_x101_32x4d_fpn_1x.py',
-        # 'guided_anchoring/ga_retinanet_r50_caffe_fpn_1x.py',
-        # 'guided_anchoring/ga_fast_r50_caffe_fpn_1x.py',
-        # 'guided_anchoring/ga_retinanet_x101_32x4d_fpn_1x.py',
-        # 'guided_anchoring/ga_rpn_r101_caffe_rpn_1x.py',
-        # 'guided_anchoring/ga_faster_r50_caffe_fpn_1x.py',
-        'guided_anchoring/ga_rpn_r50_caffe_fpn_1x.py',
-        # ---
         'foveabox/fovea_r50_fpn_4gpu_1x.py',
-        # 'foveabox/fovea_align_gn_ms_r101_fpn_4gpu_2x.py',
-        # 'foveabox/fovea_align_gn_r50_fpn_4gpu_2x.py',
-        # 'foveabox/fovea_align_gn_r101_fpn_4gpu_2x.py',
-        'foveabox/fovea_align_gn_ms_r50_fpn_4gpu_2x.py',
         # ---
         # 'hrnet/cascade_rcnn_hrnetv2p_w32_20e.py',
         # 'hrnet/mask_rcnn_hrnetv2p_w32_1x.py',
@@ -117,20 +92,6 @@ def test_config_build_detector():
         # 'gn/mask_rcnn_r50_fpn_gn_2x.py',
         # 'gn/mask_rcnn_r101_fpn_gn_2x.py',
         # ---
-        # 'reppoints/reppoints_moment_x101_dcn_fpn_2x.py',
-        'reppoints/reppoints_moment_r50_fpn_2x.py',
-        # 'reppoints/reppoints_moment_x101_dcn_fpn_2x_mt.py',
-        'reppoints/reppoints_partial_minmax_r50_fpn_1x.py',
-        'reppoints/bbox_r50_grid_center_fpn_1x.py',
-        # 'reppoints/reppoints_moment_r101_dcn_fpn_2x.py',
-        # 'reppoints/reppoints_moment_r101_fpn_2x_mt.py',
-        # 'reppoints/reppoints_moment_r50_fpn_2x_mt.py',
-        'reppoints/reppoints_minmax_r50_fpn_1x.py',
-        # 'reppoints/reppoints_moment_r50_fpn_1x.py',
-        # 'reppoints/reppoints_moment_r101_fpn_2x.py',
-        # 'reppoints/reppoints_moment_r101_dcn_fpn_2x_mt.py',
-        'reppoints/bbox_r50_grid_fpn_1x.py',
-        # ---
         # 'fcos/fcos_mstrain_640_800_x101_64x4d_fpn_gn_2x.py',
         # 'fcos/fcos_mstrain_640_800_r101_caffe_fpn_gn_2x_4gpu.py',
         'fcos/fcos_r50_caffe_fpn_gn_1x_4gpu.py',
@@ -149,6 +110,52 @@ def test_config_build_detector():
         'fp16/mask_rcnn_r50_fpn_fp16_1x.py',
         'fp16/faster_rcnn_r50_fpn_fp16_1x.py'
     ]
+
+    if not mmdet.version.CPU_ONLY:
+        config_names_gpu_only = [
+            # 'dcn/faster_rcnn_dconv_c3-c5_r50_fpn_1x.py',
+            # 'dcn/cascade_mask_rcnn_dconv_c3-c5_r50_fpn_1x.py',
+            # 'dcn/faster_rcnn_dpool_r50_fpn_1x.py',
+            'dcn/mask_rcnn_dconv_c3-c5_r50_fpn_1x.py',
+            # 'dcn/faster_rcnn_dconv_c3-c5_x101_32x4d_fpn_1x.py',
+            # 'dcn/cascade_rcnn_dconv_c3-c5_r50_fpn_1x.py',
+            # 'dcn/faster_rcnn_mdpool_r50_fpn_1x.py',
+            # 'dcn/faster_rcnn_mdconv_c3-c5_group4_r50_fpn_1x.py',
+            # 'dcn/faster_rcnn_mdconv_c3-c5_r50_fpn_1x.py',
+            # ---
+            # 'htc/htc_dconv_c3-c5_mstrain_400_1400_x101_64x4d_fpn_20e.py',
+            # ---
+            'empirical_attention/faster_rcnn_r50_fpn_attention_0010_dcn_1x.py',
+            # 'empirical_attention/faster_rcnn_r50_fpn_attention_1111_dcn_1x.py',
+            # ---
+            # 'guided_anchoring/ga_faster_x101_32x4d_fpn_1x.py',
+            # 'guided_anchoring/ga_retinanet_r50_caffe_fpn_1x.py',
+            # 'guided_anchoring/ga_fast_r50_caffe_fpn_1x.py',
+            # 'guided_anchoring/ga_retinanet_x101_32x4d_fpn_1x.py',
+            # 'guided_anchoring/ga_rpn_r101_caffe_rpn_1x.py',
+            # 'guided_anchoring/ga_faster_r50_caffe_fpn_1x.py',
+            'guided_anchoring/ga_rpn_r50_caffe_fpn_1x.py',
+            # ---
+            # 'foveabox/fovea_align_gn_ms_r101_fpn_4gpu_2x.py',
+            # 'foveabox/fovea_align_gn_r50_fpn_4gpu_2x.py',
+            # 'foveabox/fovea_align_gn_r101_fpn_4gpu_2x.py',
+            'foveabox/fovea_align_gn_ms_r50_fpn_4gpu_2x.py',
+            # ---
+            # 'reppoints/reppoints_moment_x101_dcn_fpn_2x.py',
+            'reppoints/reppoints_moment_r50_fpn_2x.py',
+            # 'reppoints/reppoints_moment_x101_dcn_fpn_2x_mt.py',
+            'reppoints/reppoints_partial_minmax_r50_fpn_1x.py',
+            'reppoints/bbox_r50_grid_center_fpn_1x.py',
+            # 'reppoints/reppoints_moment_r101_dcn_fpn_2x.py',
+            # 'reppoints/reppoints_moment_r101_fpn_2x_mt.py',
+            # 'reppoints/reppoints_moment_r50_fpn_2x_mt.py',
+            'reppoints/reppoints_minmax_r50_fpn_1x.py',
+            # 'reppoints/reppoints_moment_r50_fpn_1x.py',
+            # 'reppoints/reppoints_moment_r101_fpn_2x.py',
+            # 'reppoints/reppoints_moment_r101_dcn_fpn_2x_mt.py',
+            'reppoints/bbox_r50_grid_fpn_1x.py'
+        ]
+        config_names.extend(config_names_gpu_only)
 
     print('Using {} config files'.format(len(config_names)))
 
