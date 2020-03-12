@@ -28,8 +28,7 @@ def main():
     else:
         device = torch.device('cuda', args.device)
 
-    model = init_detector(
-        args.config, args.checkpoint, device=device)
+    model = init_detector(args.config, args.checkpoint, device=device)
 
     camera = cv2.VideoCapture(args.camera_id)
 

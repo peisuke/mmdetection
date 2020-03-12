@@ -6,19 +6,11 @@ from mmcv.cnn import constant_init, kaiming_init
 from .conv_ws import ConvWS2d
 from .norm import build_norm_layer
 
-conv_cfg = {
-    'Conv': nn.Conv2d,
-    'ConvWS': ConvWS2d
-}
-
-import mmdet
-
-if not mmdet.version.CPU_ONLY:
+try:
     from mmdet.ops import DeformConvPack, ModulatedDeformConvPack
-    conv_cfg = {
-        'DCN': DeformConvPack,
-        'DCNv2': ModulatedDeformConvPack
-    }
+    conv_cfg = {'DCN': DeformConvPack, 'DCNv2': ModulatedDeformConvPack}
+except ImportError:
+    conv_cfg = {'Conv': nn.Conv2d, 'ConvWS': ConvWS2d}
 
 
 def build_conv_layer(cfg, *args, **kwargs):

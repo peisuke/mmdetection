@@ -68,7 +68,7 @@ python setup.py develop --cpu
 After installation, you can always get the current mode by checking the constant : ```mmdet.version.CPU_ONLY```
 
 In CPU_ONLY mode you can run the demo/webcam_demo.py for example.
-However some functionality is gone in this mode : 
+However some functionality is gone in this mode :
 * Deformable Convolution
 * Deformable ROI pooling
 * CARAFE: Content-Aware ReAssembly of FEatures
